@@ -89,11 +89,11 @@ with open('ENSG_gene.mapping', 'rb') as f:
 
 data_load_state = st.text('Loading data...')
 cloned_output = copy.deepcopy(get_shapley_value_data(train, dict_map_result))
-data_load_state.text("Done Data Loading! (using st.cache)")
+data_load_state.text("Done Data Loading! (using st.cache_data)")
 X, shap_values, exval, patient_index, auc_train, auc_test, labels_actual, labels_pred, shap_values_up, len_train, len_test = cloned_output 
 
 
-col0, col00 = st.beta_columns(2)
+col0, col00 = st.columns(2)
 with col0:
     st.subheader("Data Statistics")
     st.info ('Total Features: {}'.format(X.shape[1]))
@@ -109,7 +109,7 @@ st.subheader('Summary Plot')
 st.write("""Shows top-20 features that have the most significant impact on the classification model. In the figure, it shows that University of Pennsylvania Smell Identification Test (UP SIT) is the most important factor. It also indicates that lower UPSIT feature (blue color) value corresponds to higher probability of PD, as most of the blue colored points lie on the right side of baseline. On the other end, for PRS90, lower expression values align with more healthy behaviour as blue colored points on the plot have negative impact on the model output. In this way, we can also observe that the directionality of different genetic features is not uniform.""")
 if st.checkbox('Show Summary Plots'):
     shap_type = 'trainXGB'
-    col1, col2 = st.beta_columns(2)
+    col1, col2 = st.columns(2)
     with col1:
         fig, ax = plt.subplots()
         shap.plots.beeswarm(shap.Explanation(values=np.copy(shap_values), base_values=np.array([exval]*len(X)), data=np.copy(X.values), feature_names=X.columns), show=False, max_display=20, order = shap.Explanation(values=np.copy(shap_values), base_values=np.array([exval]*len(X)), data=np.copy(X.values), feature_names=X.columns).mean(0).abs)# , return_objects=True 
@@ -137,7 +137,7 @@ inds = shap.utils.potential_interactions(shap.Explanation(values=np.copy(shap_va
 
 st.write('Top3 Potential Interactions for ***{}***'.format(feature_name))
 if st.checkbox('Show Dependence Plots'):
-    col3, col4, col5 = st.beta_columns(3)
+    col3, col4, col5 = st.columns(3)
     with col3:
         shap.dependence_plot(feature_name, np.copy(shap_values), X.copy(), interaction_index=list(X.columns).index(list(X.columns)[inds[0]]))
         st.pyplot()
@@ -165,7 +165,7 @@ misclassified = y_pred != labels_actual_new
 
 st.write('#### Pathways for Prediction (Hierarchical Clustering)')
 if st.checkbox('Show Decision Plots'):
-    col3, col4, col5 = st.beta_columns(3)
+    col3, col4, col5 = st.columns(3)
     with col3:
         st.write('Typical Prediction Path: Uncertainity (0.3-0.7)')
         r = shap.decision_plot(exval, np.copy(shap_values), list(X.columns), feature_order='hclust', return_objects=True, show=False)
@@ -203,7 +203,7 @@ if st.checkbox('Show Decision Plots'):
 
 st.write('#### Pathways for Prediction (Feature Importance)')
 if st.checkbox('Show Pathways Plots'):
-    col31, col41, col51 = st.beta_columns(3)
+    col31, col41, col51 = st.columns(3)
     with col31:
         st.write('Typical Prediction Path: Uncertainity (0.3-0.7)')
         r = shap.decision_plot(exval, np.copy(shap_values), list(X.columns), return_objects=True, show=False)
@@ -242,7 +242,7 @@ if st.checkbox('Show Pathways Plots'):
 
 st.write('#### Pathways for Misclassified Samples')
 if st.checkbox('Show Misclassified Plots'):
-    col6, col7 = st.beta_columns(2)
+    col6, col7 = st.columns(2)
     with col6:
         st.info('Misclassifications (test): {}/{}'.format(misclassified[len_train:].sum(), len_test))
         fig, ax = plt.subplots()
@@ -293,7 +293,7 @@ if st.checkbox('Show Force Plots'):
     patient_name = st.selectbox('Select patient id', options=list(patient_index))
     # st.info('You selected ***{}***'.format(patient_name))
     sample_id = patient_index.index(patient_name)
-    col8, col9 = st.beta_columns(2)
+    col8, col9 = st.columns(2)
     with col8:
         st.info('Actual Label: ***{}***'.format('PD' if labels_actual[sample_id]==1 else 'HC'))
         st.info('Predicted PD class Probability: ***{}***'.format(round(float(labels_pred[sample_id]), 2)))
@@ -301,7 +301,7 @@ if st.checkbox('Show Force Plots'):
         shap.force_plot(exval, shap_values[sample_id,:], X.iloc[sample_id,:], show=False, matplotlib=True)
         st.pyplot()
     
-    col10, col11 = st.beta_columns(2)
+    col10, col11 = st.columns(2)
     with col10:
         fig, ax = plt.subplots()
         shap.decision_plot(exval, shap_values[sample_id], X.iloc[sample_id], link='logit', highlight=0, new_base_value=0)
